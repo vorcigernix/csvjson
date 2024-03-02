@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "csvjson"
+version = "0.1.0"
+authors = ["Adam Sobotka <vorcigernix@gmail.com>"]
+description = "csv to json conversion"
+
+[[trigger.http]]
+route = "/..."
+component = "csvjson"
+
+[component.csvjson]
+source = "target/wasm32-wasi/release/csvjson.wasm"
+allowed_outbound_hosts = []
+[component.csvjson.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]
