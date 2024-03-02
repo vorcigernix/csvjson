@@ -1,4 +1,6 @@
-on: push
+#replace with on:push tu run on any change
+on:
+  workflow_dispatch:
 permissions:
   contents: write
   deployments: write
