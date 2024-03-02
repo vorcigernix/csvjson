@@ -1,0 +1,16 @@
+on: push
+permissions:
+  contents: write
+  deployments: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          curl --data-binary @uspop.csv https://csvjson.fermyon.app/ > $GITHUB_WORKSPACE/src/data/uspopdata.json
+          git add .
+          git commit -m "generated"
+          git push
