@@ -6,7 +6,7 @@ use serde_json::to_string;
 
 #[http_component]
 async fn handle_csvjson(req: Request) -> anyhow::Result<impl IntoResponse> {
-    let (status, body) = match *req.method() {
+    match req.method() {
         Method::Post => {
             let body: Vec<u8> = req.body().to_vec();
             let mut rdr = csv::ReaderBuilder::new()
@@ -19,10 +19,7 @@ async fn handle_csvjson(req: Request) -> anyhow::Result<impl IntoResponse> {
             for result in rdr.records() {
                 match result {
                     Ok(record) => {
-                        //let record_map: HashMap<_, _> = header.iter().zip(record.iter()).collect();
                         let record_map: HashMap<_, _> = header.iter().zip(record.iter()).map(|(header, value)| (header.to_owned(), value.to_owned())).collect();
-                        //let record_json = json!(record_map);
-                        //println!("{}", record_json);
                         records.push(record_map);
                     }
                     Err(err) => println!("Error: {:?}", err),
@@ -35,20 +32,27 @@ async fn handle_csvjson(req: Request) -> anyhow::Result<impl IntoResponse> {
                 .body(json_response.to_string())
                 .build())
         }
-        Method::Get => {
-            Ok(Response::builder()
-                .status(200)
-                .header("content-type", "text/plain")
-                .body("Hello, World!".to_string())
-                .build())
-        }
         _ => {
+            const BODY: &str = r#"
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>CSV to JSON</title>
+                    </head>
+                    <body style="text-align:center">
+                        <h1>CSV to JSON</h1>
+                        <p>This is an API service that converts your CSV into JSON structure. CSV needs to be properly delimited and formatted.&nbsp;</p>
+                        <p>Usage:&nbsp;curl --data-binary @****.csv <a href="https://csvjson.fermyon.app">https://csvjson.fermyon.app</a></p>                     
+                        <p>Kudos to <a href="https://developer.fermyon.com/">Fermyon</a> for allowing this service to run.</p>
+                    </body>
+                </html>"#;
             Ok(Response::builder()
-                .status(405)
-                .header("content-type", "text/plain")
-                .body("Method Not Allowed".to_string())
-                .build())
+            .status(200)
+            .header("content-type", "text/html")
+            .body(BODY.to_string())
+            .build())
         }
-    };
-    Ok(Response::new(status, body))
+        
+    }
+
 }
