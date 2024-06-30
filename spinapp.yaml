@@ -1,0 +1,16 @@
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinApp
+metadata:
+  name: csvjson
+spec:
+  image: "ttl.sh/csvjson:24h"
+  executor: containerd-shim-spin
+  enableAutoscaling: true
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 400Mi
+---
